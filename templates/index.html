@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h1 class="display-4 mb-4">Drone Blood Delivery System</h1>
+                <p class="lead">Emergency blood delivery using autonomous drones</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-tint fa-3x mb-3 text-danger"></i>
+                <h3>Request Blood</h3>
+                <p>Request emergency blood supply for your hospital</p>
+                <a href="{{ url_for('request_blood') }}" class="btn btn-primary">
+                    Make Request
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-edit fa-3x mb-3 text-primary"></i>
+                <h3>Update Inventory</h3>
+                <p>Update your hospital's blood inventory</p>
+                <a href="{{ url_for('update_inventory') }}" class="btn btn-primary">
+                    Update Now
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-database fa-3x mb-3 text-success"></i>
+                <h3>View Database</h3>
+                <p>Check current blood inventory and requests</p>
+                <a href="{{ url_for('view_database') }}" class="btn btn-primary">
+                    View Data
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">How It Works</h3>
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-hospital fa-2x mb-3 text-primary"></i>
+                        <h5>1. Request Blood</h5>
+                        <p>Hospital requests blood with type and urgency</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-search fa-2x mb-3 text-primary"></i>
+                        <h5>2. Find Nearest Source</h5>
+                        <p>System locates nearest hospital with required blood</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-helicopter fa-2x mb-3 text-primary"></i>
+                        <h5>3. Drone Dispatch</h5>
+                        <p>Autonomous drone is dispatched to collect blood</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-truck fa-2x mb-3 text-primary"></i>
+                        <h5>4. Delivery</h5>
+                        <p>Blood is delivered to requesting hospital</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

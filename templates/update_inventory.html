@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Update Blood Inventory</h2>
+                <form method="POST" action="{{ url_for('update_inventory') }}">
+                    <div class="mb-3">
+                        <label for="hospital_id" class="form-label">Select Hospital</label>
+                        <select class="form-select" id="hospital_id" name="hospital_id" required>
+                            <option value="">Choose your hospital...</option>
+                            {% for hospital in hospitals %}
+                            <option value="{{ hospital.id }}">{{ hospital.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="blood_type" class="form-label">Blood Type</label>
+                        <select class="form-select" id="blood_type" name="blood_type" required>
+                            <option value="">Select blood type...</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="units" class="form-label">Available Units</label>
+                        <input type="number" class="form-control" id="units" name="units" min="0" required>
+                        <div class="form-text">Enter the current number of units available for this blood type</div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i>Update Inventory
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
