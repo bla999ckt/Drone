@@ -22,3 +22,52 @@
 2025-05-10 21:56:26,122 - INFO - 127.0.0.1 - - [2025-05-10 21:56:26] "GET /socket.io/?EIO=4&transport=polling&t=PQwUvzm&sid=bsXBqwgEiTm2TtdLAAAA HTTP/1.1" 200 157 0.000235
 2025-05-10 21:56:26,136 - INFO - 127.0.0.1 - - [2025-05-10 21:56:26] "GET /socket.io/?EIO=4&transport=polling&t=PQwUv-E&sid=bsXBqwgEiTm2TtdLAAAA HTTP/1.1" 200 157 0.000149
 2025-05-10 21:56:44,171 - INFO - 127.0.0.1 - - [2025-05-10 21:56:44] "GET / HTTP/1.1" 200 9044 0.002010
+2025-05-10 21:58:36,250 - INFO - 127.0.0.1 - - [2025-05-10 21:58:36] "GET /request-blood HTTP/1.1" 200 9082 0.005089
+2025-05-10 21:58:50,215 - INFO - New blood request: Hospital ID 1, Blood Type AB+, Units 3, Urgency critical
+2025-05-10 21:58:50,265 - WARNING - No hospitals found with required blood type AB+
+2025-05-10 21:58:50,267 - INFO - 127.0.0.1 - - [2025-05-10 21:58:50] "POST /request-blood HTTP/1.1" 302 509 0.089197
+2025-05-10 21:58:50,278 - INFO - 127.0.0.1 - - [2025-05-10 21:58:50] "GET / HTTP/1.1" 200 9477 0.002886
+2025-05-10 21:58:53,164 - INFO - 127.0.0.1 - - [2025-05-10 21:58:53] "GET /update-inventory HTTP/1.1" 200 8594 0.005622
+2025-05-10 21:58:59,809 - INFO - Inventory updated: Hospital ID 2, Blood Type B+, Units 4
+2025-05-10 21:58:59,811 - INFO - 127.0.0.1 - - [2025-05-10 21:58:59] "POST /update-inventory HTTP/1.1" 302 549 0.046441
+2025-05-10 21:58:59,838 - INFO - 127.0.0.1 - - [2025-05-10 21:58:59] "GET /update-inventory HTTP/1.1" 200 9021 0.009709
+2025-05-10 21:59:02,228 - INFO - 127.0.0.1 - - [2025-05-10 21:59:02] "GET /view-database HTTP/1.1" 500 26945 0.038990
+2025-05-10 21:59:02,298 - INFO - 127.0.0.1 - - [2025-05-10 21:59:02] "GET /view-database?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 6288 0.016329
+2025-05-10 21:59:02,308 - INFO - 127.0.0.1 - - [2025-05-10 21:59:02] "GET /view-database?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 10294 0.003275
+2025-05-10 21:59:02,412 - INFO - 127.0.0.1 - - [2025-05-10 21:59:02] "GET /view-database?__debugger__=yes&cmd=resource&f=console.png&s=XxU4xomdolvOIRT0Cm7b HTTP/1.1" 200 705 0.001008
+2025-05-10 21:59:02,445 - INFO - 127.0.0.1 - - [2025-05-10 21:59:02] "GET /view-database?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 705 0.001219
+2025-05-10 21:59:53,470 - INFO - 127.0.0.1 - - [2025-05-10 21:59:53] "GET /drone-status HTTP/1.1" 200 12346 0.001178
+2025-05-10 21:59:53,564 - INFO - 127.0.0.1 - - [2025-05-10 21:59:53] "GET /socket.io/?EIO=4&transport=polling&t=PQwVidH HTTP/1.1" 200 254 0.000511
+2025-05-10 21:59:53,597 - INFO - 127.0.0.1 - - [2025-05-10 21:59:53] "POST /socket.io/?EIO=4&transport=polling&t=PQwVide&sid=krIHIRXhSQ-t9LRmAAAC HTTP/1.1" 200 195 0.004650
+2025-05-10 21:59:53,616 - INFO - 127.0.0.1 - - [2025-05-10 21:59:53] "GET /socket.io/?EIO=4&transport=polling&t=PQwVidi&sid=krIHIRXhSQ-t9LRmAAAC HTTP/1.1" 200 280 0.023586
+2025-05-10 21:59:53,626 - INFO - 127.0.0.1 - - [2025-05-10 21:59:53] "GET /socket.io/?EIO=4&transport=polling&t=PQwVieM&sid=krIHIRXhSQ-t9LRmAAAC HTTP/1.1" 200 157 0.000198
+2025-05-10 21:59:58,915 - INFO - 127.0.0.1 - - [2025-05-10 21:59:58] "GET /manage-hospitals HTTP/1.1" 200 12950 0.008020
+2025-05-10 22:01:53,570 - INFO -  * Restarting with stat
+2025-05-10 22:01:56,082 - WARNING -  * Debugger is active!
+2025-05-10 22:01:56,097 - INFO -  * Debugger PIN: 101-589-293
+2025-05-10 22:02:01,600 - INFO - 127.0.0.1 - - [2025-05-10 22:02:01] "GET /manage-hospitals HTTP/1.1" 200 12950 0.027605
+2025-05-10 22:02:02,619 - INFO - 127.0.0.1 - - [2025-05-10 22:02:02] "GET / HTTP/1.1" 200 9044 0.005658
+2025-05-10 22:02:05,273 - INFO - 127.0.0.1 - - [2025-05-10 22:02:05] "GET /request-blood HTTP/1.1" 200 9082 0.007923
+2025-05-10 22:02:12,618 - INFO - New blood request: Hospital ID 3, Blood Type A-, Units 3, Urgency critical
+2025-05-10 22:02:12,641 - INFO - Route planned: From East Medical Center to East Medical Center
+2025-05-10 22:02:12,642 - INFO - Blood type: A-, Units: 3
+2025-05-10 22:02:12,647 - INFO - 127.0.0.1 - - [2025-05-10 22:02:12] "POST /request-blood HTTP/1.1" 302 509 0.038636
+2025-05-10 22:02:12,653 - INFO - 127.0.0.1 - - [2025-05-10 22:02:12] "GET / HTTP/1.1" 200 9477 0.001384
+2025-05-10 22:02:16,238 - INFO - 127.0.0.1 - - [2025-05-10 22:02:16] "GET /view-database HTTP/1.1" 200 18923 0.025698
+2025-05-10 22:02:23,100 - INFO - 127.0.0.1 - - [2025-05-10 22:02:23] "GET /request-blood HTTP/1.1" 200 9082 0.001814
+2025-05-10 22:02:27,168 - INFO - 127.0.0.1 - - [2025-05-10 22:02:27] "GET /update-inventory HTTP/1.1" 200 8594 0.003952
+2025-05-10 22:02:31,521 - INFO - 127.0.0.1 - - [2025-05-10 22:02:31] "GET /view-database HTTP/1.1" 200 18923 0.005395
+2025-05-10 22:02:39,544 - INFO - 127.0.0.1 - - [2025-05-10 22:02:39] "GET /update-inventory HTTP/1.1" 200 8594 0.004124
+2025-05-10 22:02:40,902 - INFO - 127.0.0.1 - - [2025-05-10 22:02:40] "GET /request-blood HTTP/1.1" 200 9082 0.002392
+2025-05-10 22:02:49,894 - INFO - 127.0.0.1 - - [2025-05-10 22:02:49] "GET /update-inventory HTTP/1.1" 200 8594 0.001978
+2025-05-10 22:02:55,233 - INFO - Inventory updated: Hospital ID 1, Blood Type A+, Units 4
+2025-05-10 22:02:55,242 - INFO - 127.0.0.1 - - [2025-05-10 22:02:55] "POST /update-inventory HTTP/1.1" 302 549 0.016163
+2025-05-10 22:02:55,249 - INFO - 127.0.0.1 - - [2025-05-10 22:02:55] "GET /update-inventory HTTP/1.1" 200 9021 0.001943
+2025-05-10 22:02:56,516 - INFO - 127.0.0.1 - - [2025-05-10 22:02:56] "GET /view-database HTTP/1.1" 200 18922 0.005360
+2025-05-10 22:03:00,599 - INFO - 127.0.0.1 - - [2025-05-10 22:03:00] "GET /drone-status HTTP/1.1" 200 12346 0.003714
+2025-05-10 22:03:01,032 - INFO - 127.0.0.1 - - [2025-05-10 22:03:01] "GET /socket.io/?EIO=4&transport=polling&t=PQwWQOT HTTP/1.1" 200 254 0.000596
+2025-05-10 22:03:01,066 - INFO - 127.0.0.1 - - [2025-05-10 22:03:01] "POST /socket.io/?EIO=4&transport=polling&t=PQwWQOu&sid=v_ux95fHhb_X1_y5AAAA HTTP/1.1" 200 195 0.004223
+2025-05-10 22:03:01,082 - INFO - 127.0.0.1 - - [2025-05-10 22:03:01] "GET /socket.io/?EIO=4&transport=polling&t=PQwWQOw&sid=v_ux95fHhb_X1_y5AAAA HTTP/1.1" 200 280 0.001721
+2025-05-10 22:03:01,088 - INFO - 127.0.0.1 - - [2025-05-10 22:03:01] "GET /socket.io/?EIO=4&transport=polling&t=PQwWQPM&sid=v_ux95fHhb_X1_y5AAAA HTTP/1.1" 200 157 0.000405
+2025-05-10 22:03:01,098 - INFO - 127.0.0.1 - - [2025-05-10 22:03:01] "GET /socket.io/?EIO=4&transport=polling&t=PQwWQPX&sid=v_ux95fHhb_X1_y5AAAA HTTP/1.1" 200 157 0.000264
+2025-05-10 22:03:01,753 - INFO - 127.0.0.1 - - [2025-05-10 22:03:01] "GET /manage-hospitals HTTP/1.1" 200 12950 0.004639

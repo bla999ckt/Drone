@@ -52,6 +52,7 @@ class BloodRequest(db.Model):
     urgency = db.Column(db.String(20), nullable=False)
     status = db.Column(db.String(20), default='pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    hospital = db.relationship('Hospital', backref='blood_requests')
 
 # Routes
 @app.route('/')
