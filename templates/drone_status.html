@@ -1,69 +1,253 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Header Section -->
+<div class="text-center mb-5 fade-in-up">
+    <div class="feature-icon mx-auto mb-4" style="width: 100px; height: 100px; font-size: 2.5rem;">
+        <i class="fas fa-satellite-dish"></i>
+    </div>
+    <h1 class="hero-title" style="font-size: 2.5rem; color: var(--gray-900);">Drone Development Center</h1>
+    <p class="hero-subtitle" style="color: var(--gray-600);">Monitoring and testing autonomous delivery drone development</p>
+</div>
+
 <div class="row">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-body">
-                <h2 class="card-title">Drone Location</h2>
-                <div id="map" style="height: 500px; border-radius: 10px;"></div>
+    <!-- Map Section -->
+    <div class="col-lg-8 mb-4">
+        <div class="card fade-in-up">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Live Drone Location</h3>
+            </div>
+            <div class="card-body p-0">
+                <div id="map" style="height: 500px; border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);"></div>
             </div>
         </div>
     </div>
     
-    <div class="col-md-4">
-        <div class="card mb-4">
+    <!-- Status Panel -->
+    <div class="col-lg-4 mb-4">
+        <div class="card fade-in-up" style="animation-delay: 0.2s;">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-helicopter me-2"></i>Drone Status</h3>
+            </div>
             <div class="card-body">
-                <h2 class="card-title">Drone Status</h2>
-                <div class="status-container">
+                <div class="status-grid">
                     <div class="status-item">
+                        <div class="status-icon">
                         <i class="fas fa-satellite-dish"></i>
-                        <span>Connection Status:</span>
-                        <span id="connection-status" class="badge bg-secondary">Disconnected</span>
+                        </div>
+                        <div class="status-content">
+                            <span class="status-label">Connection</span>
+                            <span id="connection-status" class="status-value status-offline">Disconnected</span>
+                        </div>
                     </div>
+                    
                     <div class="status-item">
+                        <div class="status-icon">
                         <i class="fas fa-plane"></i>
-                        <span>Flight Mode:</span>
-                        <span id="flight-mode" class="badge bg-info">Unknown</span>
+                        </div>
+                        <div class="status-content">
+                            <span class="status-label">Flight Mode</span>
+                            <span id="flight-mode" class="status-value">Unknown</span>
+                        </div>
                     </div>
+                    
                     <div class="status-item">
+                        <div class="status-icon">
                         <i class="fas fa-battery-three-quarters"></i>
-                        <span>Battery Level:</span>
-                        <span id="battery-level" class="badge bg-success">100%</span>
+                        </div>
+                        <div class="status-content">
+                            <span class="status-label">Battery</span>
+                            <span id="battery-level" class="status-value status-success">100%</span>
+                        </div>
                     </div>
+                    
                     <div class="status-item">
+                        <div class="status-icon">
                         <i class="fas fa-tachometer-alt"></i>
-                        <span>Speed:</span>
-                        <span id="speed" class="badge bg-primary">0 m/s</span>
+                        </div>
+                        <div class="status-content">
+                            <span class="status-label">Speed</span>
+                            <span id="speed" class="status-value">0 m/s</span>
+                        </div>
                     </div>
+                    
                     <div class="status-item">
+                        <div class="status-icon">
                         <i class="fas fa-mountain"></i>
-                        <span>Altitude:</span>
-                        <span id="altitude" class="badge bg-warning">0 m</span>
+                        </div>
+                        <div class="status-content">
+                            <span class="status-label">Altitude</span>
+                            <span id="altitude" class="status-value">0 m</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Control Buttons -->
+                <div class="control-buttons mt-4">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button class="btn btn-info btn-sm w-100" onclick="refreshLocation()">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-warning btn-sm w-100" onclick="debugDrone()">
+                                <i class="fas fa-bug me-1"></i>Debug
+                    </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-secondary btn-sm w-100" onclick="debugGPS()">
+                                <i class="fas fa-satellite me-1"></i>GPS Debug
+                    </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-primary btn-sm w-100" onclick="selectMission()">
+                                <i class="fas fa-plane me-1"></i>Mission
+                    </button>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-success btn-sm w-100" onclick="viewPendingRequests()">
+                                <i class="fas fa-list me-1"></i>Pending Requests
+                    </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card">
+        <!-- Mission Status -->
+        <div class="card fade-in-up" style="animation-delay: 0.4s;">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-route me-2"></i>Mission Status</h3>
+            </div>
             <div class="card-body">
-                <h2 class="card-title">Mission Status</h2>
-                <div class="mission-status">
-                    <div class="mission-step">
-                        <i class="fas fa-check-circle text-success"></i>
-                        <span>Takeoff</span>
+                <div class="mission-timeline">
+                    <div class="mission-step completed">
+                        <div class="step-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="step-content">
+                            <span class="step-title">Takeoff</span>
+                            <span class="step-time">Completed</span>
+                        </div>
                     </div>
-                    <div class="mission-step">
-                        <i class="fas fa-circle text-muted"></i>
-                        <span>Pickup Blood</span>
+                    
+                    <div class="mission-step active">
+                        <div class="step-icon">
+                            <i class="fas fa-circle pulse"></i>
+                        </div>
+                        <div class="step-content">
+                            <span class="step-title">Pickup Blood</span>
+                            <span class="step-time">In Progress</span>
+                        </div>
                     </div>
+                    
                     <div class="mission-step">
-                        <i class="fas fa-circle text-muted"></i>
-                        <span>Delivery</span>
+                        <div class="step-icon">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <div class="step-content">
+                            <span class="step-title">Delivery</span>
+                            <span class="step-time">Pending</span>
+                        </div>
                     </div>
+                    
                     <div class="mission-step">
-                        <i class="fas fa-circle text-muted"></i>
-                        <span>Return Home</span>
+                        <div class="step-icon">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <div class="step-content">
+                            <span class="step-title">Return Home</span>
+                            <span class="step-time">Pending</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Current Mission Info -->
+                <div class="current-mission mt-4">
+                    <h6 class="mb-2">Current Mission:</h6>
+                    <div id="mission-details" class="mission-details">
+                        <div class="mission-info">
+                            <span class="mission-label">Status:</span>
+                            <span class="mission-value">No active mission</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Movement Status -->
+                <div class="movement-status mt-3">
+                    <span class="badge bg-info" id="movement-status">Stationary</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Status Cards -->
+<div class="row mt-4">
+    <div class="col-md-6 mb-4">
+        <div class="card fade-in-up" style="animation-delay: 0.6s;">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>System Performance</h4>
+            </div>
+            <div class="card-body">
+                <div class="performance-metrics">
+                    <div class="metric-item">
+                        <div class="metric-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="metric-content">
+                            <span class="metric-value">85.2%</span>
+                            <span class="metric-label">Test Uptime</span>
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <div class="metric-content">
+                            <span class="metric-value">23</span>
+                            <span class="metric-label">Test Runs</span>
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div class="metric-content">
+                            <span class="metric-value">28.3 min</span>
+                            <span class="metric-label">Avg Test Time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card fade-in-up" style="animation-delay: 0.8s;">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Alerts & Notifications</h4>
+            </div>
+            <div class="card-body">
+                <div class="alerts-list">
+                    <div class="alert-item">
+                        <div class="alert-icon">
+                            <i class="fas fa-info-circle text-info"></i>
+                        </div>
+                        <div class="alert-content">
+                            <span class="alert-message">Development system running normally</span>
+                            <span class="alert-time">2 min ago</span>
+                        </div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon">
+                            <i class="fas fa-check-circle text-success"></i>
+                        </div>
+                        <div class="alert-content">
+                            <span class="alert-message">Test run #23 completed successfully</span>
+                            <span class="alert-time">15 min ago</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -72,7 +256,8 @@
 </div>
 
 <style>
-.status-container {
+/* Status Grid */
+.status-grid {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -82,18 +267,72 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.5rem;
-    background-color: #f8f9fa;
-    border-radius: 5px;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
 }
 
-.status-item i {
-    font-size: 1.2rem;
-    width: 24px;
-    text-align: center;
+.status-item:hover {
+    background: white;
+    box-shadow: var(--shadow-sm);
 }
 
-.mission-status {
+.status-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.status-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.status-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.status-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.status-success {
+    color: var(--success-color);
+}
+
+.status-warning {
+    color: var(--warning-color);
+}
+
+.status-danger {
+    color: var(--danger-color);
+}
+
+.status-offline {
+    color: var(--gray-500);
+}
+
+/* Control Buttons */
+.control-buttons .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Mission Timeline */
+.mission-timeline {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -103,21 +342,192 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.5rem;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-}
-
-.mission-step i {
-    font-size: 1.2rem;
-}
-
-.mission-step.active {
-    background-color: #e3f2fd;
+    padding: 0.75rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
 }
 
 .mission-step.completed {
-    background-color: #e8f5e9;
+    background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+    border: 1px solid var(--success-color);
+}
+
+.mission-step.active {
+    background: linear-gradient(135deg, #ebf8ff, #bee3f8);
+    border: 1px solid var(--accent-color);
+}
+
+.mission-step:not(.completed):not(.active) {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+}
+
+.step-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1rem;
+}
+
+.mission-step.completed .step-icon {
+    color: var(--success-color);
+}
+
+.mission-step.active .step-icon {
+    color: var(--accent-color);
+}
+
+.mission-step:not(.completed):not(.active) .step-icon {
+    color: var(--gray-400);
+}
+
+.step-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.step-title {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.step-time {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+/* Current Mission */
+.mission-details {
+    background: var(--gray-50);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-200);
+}
+
+.mission-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.mission-label {
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.mission-value {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+/* Performance Metrics */
+.performance-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--gray-50);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-200);
+}
+
+.metric-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.metric-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+/* Alerts */
+.alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--gray-50);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-200);
+}
+
+.alert-icon {
+    font-size: 1.25rem;
+}
+
+.alert-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.alert-message {
+    font-weight: 500;
+    color: var(--gray-900);
+}
+
+.alert-time {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .status-grid {
+        gap: 0.75rem;
+    }
+    
+    .status-item {
+        padding: 0.75rem;
+    }
+    
+    .status-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    
+    .control-buttons .btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+    }
 }
 </style>
 
@@ -132,7 +542,9 @@ let pathLine;
 
 // Initialize map
 document.addEventListener('DOMContentLoaded', function() {
-    map = L.map('map').setView([0, 0], 2);
+    map = L.map('map').setView([35.8617, 104.1954], 4); // Center on China
+    
+    // Use OpenStreetMap as fallback (more reliable than Gaode)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
@@ -147,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function() {
         shadowSize: [41, 41]
     });
 
-    droneMarker = L.marker([0, 0], {icon: droneIcon}).addTo(map);
+    droneMarker = L.marker([35.8617, 104.1954], {icon: droneIcon}).addTo(map);
     pathLine = L.polyline([], {color: 'red'}).addTo(map);
 });
 
@@ -156,39 +568,373 @@ const socket = io();
 
 socket.on('connect', function() {
     console.log('Connected to server');
+    // Request drone status when page loads
+    socket.emit('request_drone_status');
+    
+    // Start auto-refresh every 2 seconds
+    setInterval(function() {
+        socket.emit('request_drone_status');
+    }, 2000);
 });
 
 socket.on('drone_status', function(data) {
+    console.log('Received drone status:', data);
     updateDroneStatus(data);
 });
 
 function updateDroneStatus(data) {
     // Update connection status
     const connectionStatus = document.getElementById('connection-status');
-    connectionStatus.textContent = data.connected ? 'Connected' : 'Disconnected';
-    connectionStatus.className = `badge ${data.connected ? 'bg-success' : 'bg-danger'}`;
+    connectionStatus.textContent = data.connected ? 'Connected' : 'Not Connected';
+    connectionStatus.className = `status-value ${data.connected ? 'status-success' : 'status-offline'}`;
 
     // Update flight mode
     document.getElementById('flight-mode').textContent = data.mode || 'Unknown';
 
+    // Update speed
+    const speedElement = document.getElementById('speed');
+    if (data.speed !== undefined) {
+        speedElement.textContent = `${data.speed.toFixed(1)} m/s`;
+    }
+
+    // Update battery level with charging status
+    const batteryElement = document.getElementById('battery-level');
+    if (data.battery !== undefined) {
+        let batteryText = `${data.battery}%`;
+        if (data.is_charging) {
+            batteryText += ' (Charging)';
+        }
+        batteryElement.textContent = batteryText;
+        
+        // Change color based on battery level and charging status
+        if (data.is_charging) {
+            batteryElement.className = 'status-value status-info';
+        } else if (data.battery > 50) {
+            batteryElement.className = 'status-value status-success';
+        } else if (data.battery > 20) {
+            batteryElement.className = 'status-value status-warning';
+        } else {
+            batteryElement.className = 'status-value status-danger';
+        }
+    }
+
     // Update location if available
-    if (data.location) {
+    if (data.connected && data.location && data.location.lat && data.location.lon) {
         const {lat, lon, alt, heading} = data.location;
         
-        // Update map
+        console.log('Updating drone position:', lat, lon, alt);
+        
+        // Update map to show drone location
         droneMarker.setLatLng([lat, lon]);
-        map.setView([lat, lon], 15);
+        
+        // Only change map view if it's the first time or if moving
+        if (path.length === 0 || data.is_moving) {
+            map.setView([lat, lon], 15);
+        }
 
-        // Update path
-        path.push([lat, lon]);
-        pathLine.setLatLngs(path);
+        // Only add to path if actually moving (speed > 0.5 m/s)
+        if (data.is_moving) {
+            path.push([lat, lon]);
+            pathLine.setLatLngs(path);
+        }
 
-        // Update telemetry
+        // Update telemetry with real data
         document.getElementById('altitude').textContent = `${alt.toFixed(1)} m`;
         
         // Rotate drone marker based on heading
-        droneMarker.setRotationAngle(heading);
+        if (heading !== undefined) {
+            droneMarker.setRotationAngle(heading);
+        }
+    } else {
+        // Show N/A for coordinates when not connected or no GPS
+        document.getElementById('altitude').textContent = 'N/A';
+        document.getElementById('speed').textContent = 'N/A';
+        
+        // Keep map at default position (China center)
+        map.setView([35.8617, 104.1954], 4);
+        
+        // Clear path when not connected
+        path = [];
+        pathLine.setLatLngs(path);
+        
+        // Move drone marker to default position
+        droneMarker.setLatLng([35.8617, 104.1954]);
     }
+    
+    // Update mission information
+    updateMissionInfo(data.mission, data.is_available, data.is_charging);
+    
+    // Update movement status
+    updateMovementStatus(data.is_moving);
+}
+
+function updateMissionInfo(mission, isAvailable, isCharging) {
+    const missionDetails = document.getElementById('mission-details');
+    
+    if (isCharging) {
+        missionDetails.innerHTML = `
+            <div class="mission-info">
+                <span class="mission-label">Status:</span>
+                <span class="mission-value text-info">Drone is charging</span>
+            </div>
+        `;
+        clearMissionWaypoints();
+    } else if (!isAvailable) {
+        missionDetails.innerHTML = `
+            <div class="mission-info">
+                <span class="mission-label">Status:</span>
+                <span class="mission-value text-warning">Drone unavailable (low battery)</span>
+            </div>
+        `;
+        clearMissionWaypoints();
+    } else if (mission) {
+        const missionHtml = `
+            <div class="mission-info">
+                <span class="mission-label">Blood Type:</span>
+                <span class="mission-value">${mission.blood_type}</span>
+            </div>
+            <div class="mission-info">
+                <span class="mission-label">From:</span>
+                <span class="mission-value">${mission.from_hospital.name}</span>
+            </div>
+            <div class="mission-info">
+                <span class="mission-label">To:</span>
+                <span class="mission-value">${mission.to_hospital.name}</span>
+            </div>
+            <div class="mission-info">
+                <span class="mission-label">Units:</span>
+                <span class="mission-value">${mission.units}</span>
+            </div>
+            <div class="mission-info">
+                <span class="mission-label">Urgency:</span>
+                <span class="mission-value">${mission.urgency}</span>
+            </div>
+            <div class="mission-info">
+                <span class="mission-label">Distance:</span>
+                <span class="mission-value">${mission.total_distance ? mission.total_distance.toFixed(1) : 'N/A'} km</span>
+            </div>
+            <div class="mission-info">
+                <span class="mission-label">Priority Score:</span>
+                <span class="mission-value">${mission.priority_score ? mission.priority_score.toFixed(1) : 'N/A'}</span>
+            </div>
+        `;
+        missionDetails.innerHTML = missionHtml;
+        
+        // Add mission waypoints to map
+        addMissionWaypoints(mission);
+    } else {
+        missionDetails.innerHTML = `
+            <div class="mission-info">
+                <span class="mission-label">Status:</span>
+                <span class="mission-value text-success">No pending missions</span>
+            </div>
+        `;
+        clearMissionWaypoints();
+    }
+}
+
+function updateMovementStatus(isMoving) {
+    const movementStatus = document.getElementById('movement-status');
+    if (isMoving) {
+        movementStatus.textContent = 'Moving';
+        movementStatus.className = 'badge bg-success';
+    } else {
+        movementStatus.textContent = 'Stationary';
+        movementStatus.className = 'badge bg-info';
+        // Clear path when stationary to avoid showing false movement
+        path = [];
+        pathLine.setLatLngs(path);
+    }
+}
+
+let missionMarkers = [];
+
+function addMissionWaypoints(mission) {
+    // Clear existing mission markers
+    clearMissionWaypoints();
+    
+    // Add pickup location marker
+    const pickupIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41]
+    });
+    
+    const pickupMarker = L.marker([mission.from_hospital.lat, mission.from_hospital.lon], {
+        icon: pickupIcon
+    }).addTo(map);
+    pickupMarker.bindPopup(`Pickup: ${mission.from_hospital.name}`);
+    missionMarkers.push(pickupMarker);
+    
+    // Add delivery location marker
+    const deliveryIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41]
+    });
+    
+    const deliveryMarker = L.marker([mission.to_hospital.lat, mission.to_hospital.lon], {
+        icon: deliveryIcon
+    }).addTo(map);
+    deliveryMarker.bindPopup(`Delivery: ${mission.to_hospital.name}`);
+    missionMarkers.push(deliveryMarker);
+    
+    // Add mission route line
+    const missionRoute = L.polyline([
+        [mission.from_hospital.lat, mission.from_hospital.lon],
+        [mission.to_hospital.lat, mission.to_hospital.lon]
+    ], {color: 'blue', dashArray: '5, 10'}).addTo(map);
+    missionMarkers.push(missionRoute);
+}
+
+function clearMissionWaypoints() {
+    missionMarkers.forEach(marker => {
+        map.removeLayer(marker);
+    });
+    missionMarkers = [];
+}
+
+// Add refresh location button functionality
+function refreshLocation() {
+    // Request updated drone status
+    socket.emit('request_drone_status');
+}
+
+// Add debug functionality
+function debugDrone() {
+    fetch('/debug-drone')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Debug result:', data);
+            let message = `Debug Info:\n`;
+            message += `Connected: ${data.connected}\n`;
+            message += `Connection String: ${data.connection_string}\n`;
+            message += `Has Master: ${data.has_master}\n`;
+            message += `Target System: ${data.target_system}\n`;
+            message += `Target Component: ${data.target_component}\n`;
+            
+            if (data.location) {
+                message += `\nGPS Data:\n`;
+                message += `Lat: ${data.location.lat}\n`;
+                message += `Lon: ${data.location.lon}\n`;
+                message += `Alt: ${data.location.alt}m\n`;
+            } else {
+                message += `\nNo GPS data available`;
+            }
+            
+            if (data.error) {
+                message += `\nError: ${data.error}`;
+            }
+            
+            alert(message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Debug error: ' + error);
+        });
+}
+
+// Add GPS debug functionality
+function debugGPS() {
+    fetch('/debug-gps')
+        .then(response => response.json())
+        .then(data => {
+            console.log('GPS Debug result:', data);
+            let message = `GPS Debug Info:\n`;
+            message += `Connected: ${data.connected}\n`;
+            
+            if (data.location) {
+                message += `\nProcessed Location:\n`;
+                message += `Lat: ${data.location.lat}\n`;
+                message += `Lon: ${data.location.lon}\n`;
+                message += `Alt: ${data.location.alt}m\n`;
+            } else {
+                message += `\nNo processed location data\n`;
+            }
+            
+            if (data.gps_messages && data.gps_messages.length > 0) {
+                message += `\nRaw GPS Messages (${data.gps_messages.length}):\n`;
+                data.gps_messages.forEach((msg, index) => {
+                    message += `Message ${index + 1}:\n`;
+                    message += `  Lat: ${msg.lat}\n`;
+                    message += `  Lon: ${msg.lon}\n`;
+                    message += `  Alt: ${msg.alt}\n`;
+                    message += `  Fix Type: ${msg.fix_type}\n`;
+                    message += `  Satellites: ${msg.satellites_visible}\n`;
+                });
+            } else {
+                message += `\nNo raw GPS messages received\n`;
+            }
+            
+            if (data.error) {
+                message += `\nError: ${data.error}`;
+            }
+            
+            alert(message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('GPS Debug error: ' + error);
+        });
+}
+
+// Add mission selection functionality
+function selectMission() {
+    fetch('/select-mission')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Mission selection result:', data);
+            if (data.success) {
+                let message = `Mission Selected:\n`;
+                message += `Blood Type: ${data.mission.blood_type}\n`;
+                message += `Units: ${data.mission.units}\n`;
+                message += `From: ${data.mission.from_hospital.name}\n`;
+                message += `To: ${data.mission.to_hospital.name}\n`;
+                message += `Urgency: ${data.mission.urgency}\n`;
+                message += `Distance: ${data.mission.total_distance ? data.mission.total_distance.toFixed(1) : 'N/A'} km\n`;
+                message += `Priority Score: ${data.mission.priority_score ? data.mission.priority_score.toFixed(1) : 'N/A'}`;
+                
+                alert(message);
+                // Refresh the page to show the new mission
+                socket.emit('request_drone_status');
+            } else {
+                alert('No mission available: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Mission selection error: ' + error);
+        });
+}
+
+// Add pending requests functionality
+function viewPendingRequests() {
+    fetch('/pending-requests')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Pending requests result:', data);
+            if (data.success) {
+                let message = `Pending Requests (${data.count}):\n\n`;
+                if (data.requests.length > 0) {
+                    data.requests.forEach((req, index) => {
+                        message += `${index + 1}. ${req.hospital}\n`;
+                        message += `   Blood: ${req.blood_type} (${req.units} units)\n`;
+                        message += `   Urgency: ${req.urgency}\n`;
+                        message += `   Created: ${req.created_at}\n\n`;
+                    });
+                } else {
+                    message += 'No pending requests';
+                }
+                
+                alert(message);
+            } else {
+                alert('Error getting requests: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Pending requests error: ' + error);
+        });
 }
 
 // Update mission status

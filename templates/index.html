@@ -1,87 +1,204 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12 mb-4">
-        <div class="card">
-            <div class="card-body text-center">
-                <h1 class="display-4 mb-4">Drone Blood Delivery System</h1>
-                <p class="lead">Emergency blood delivery using autonomous drones</p>
-            </div>
+<!-- Hero Section -->
+<div class="hero-section fade-in-up">
+    <div class="container text-center">
+        <h1 class="hero-title">Drone Blood Delivery Project</h1>
+        <p class="hero-subtitle">Developing autonomous drone technology for emergency medical logistics</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ url_for('request_blood') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-tint me-2"></i>Request Blood
+            </a>
+            <a href="{{ url_for('drone_status') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-satellite-dish me-2"></i>View Drone Status
+            </a>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-tint fa-3x mb-3 text-danger"></i>
-                <h3>Request Blood</h3>
-                <p>Request emergency blood supply for your hospital</p>
-                <a href="{{ url_for('request_blood') }}" class="btn btn-primary">
-                    Make Request
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-edit fa-3x mb-3 text-primary"></i>
-                <h3>Update Inventory</h3>
-                <p>Update your hospital's blood inventory</p>
-                <a href="{{ url_for('update_inventory') }}" class="btn btn-primary">
-                    Update Now
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-database fa-3x mb-3 text-success"></i>
-                <h3>View Database</h3>
-                <p>Check current blood inventory and requests</p>
-                <a href="{{ url_for('view_database') }}" class="btn btn-primary">
-                    View Data
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
+<!-- Stats Section -->
+<div class="row mb-5 fade-in-up">
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="card text-center h-100">
             <div class="card-body">
-                <h3 class="card-title">How It Works</h3>
-                <div class="row">
-                    <div class="col-md-3 text-center">
-                        <i class="fas fa-hospital fa-2x mb-3 text-primary"></i>
-                        <h5>1. Request Blood</h5>
-                        <p>Hospital requests blood with type and urgency</p>
+                <div class="feature-icon">
+                    <i class="fas fa-helicopter"></i>
+                </div>
+                <h3 class="text-gradient">Development</h3>
+                <p class="text-muted mb-0">Project Status</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="feature-icon">
+                    <i class="fas fa-tint"></i>
+                </div>
+                <h3 class="text-gradient">Prototype</h3>
+                <p class="text-muted mb-0">System Type</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="feature-icon">
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <h3 class="text-gradient">Testing</h3>
+                <p class="text-muted mb-0">Environment</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="text-gradient">In Progress</h3>
+                <p class="text-muted mb-0">Current Phase</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Features -->
+<div class="row mb-5">
+    <div class="col-md-4 mb-4">
+        <div class="feature-card slide-in-right">
+            <div class="feature-icon">
+                <i class="fas fa-tint"></i>
+            </div>
+            <h4 class="mb-3">Blood Request System</h4>
+            <p class="text-muted mb-4">Submit emergency blood requests for testing and development purposes.</p>
+            <a href="{{ url_for('request_blood') }}" class="btn btn-primary">
+                <i class="fas fa-paper-plane me-2"></i>Make Request
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="feature-card slide-in-right" style="animation-delay: 0.2s;">
+            <div class="feature-icon">
+                <i class="fas fa-edit"></i>
+            </div>
+            <h4 class="mb-3">Inventory Management</h4>
+            <p class="text-muted mb-4">Manage blood inventory data for project development and testing.</p>
+            <a href="{{ url_for('update_inventory') }}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Update Now
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="feature-card slide-in-right" style="animation-delay: 0.4s;">
+            <div class="feature-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <h4 class="mb-3">Data Analytics</h4>
+            <p class="text-muted mb-4">View and analyze project data for development insights.</p>
+            <a href="{{ url_for('view_database') }}" class="btn btn-primary">
+                <i class="fas fa-chart-line me-2"></i>View Data
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="card mb-5 fade-in-up">
+    <div class="card-header">
+        <h3 class="mb-0"><i class="fas fa-cogs me-2"></i>Project Workflow</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                        <i class="fas fa-hospital"></i>
                     </div>
-                    <div class="col-md-3 text-center">
-                        <i class="fas fa-search fa-2x mb-3 text-primary"></i>
-                        <h5>2. Find Nearest Source</h5>
-                        <p>System locates nearest hospital with required blood</p>
+                    <h5 class="mb-2">1. Submit Request</h5>
+                    <p class="text-muted small">Hospital submits blood request with type and urgency</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                        <i class="fas fa-search"></i>
                     </div>
-                    <div class="col-md-3 text-center">
-                        <i class="fas fa-helicopter fa-2x mb-3 text-primary"></i>
-                        <h5>3. Drone Dispatch</h5>
-                        <p>Autonomous drone is dispatched to collect blood</p>
+                    <h5 class="mb-2">2. Find Source</h5>
+                    <p class="text-muted small">System locates nearest hospital with required blood</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                        <i class="fas fa-helicopter"></i>
                     </div>
-                    <div class="col-md-3 text-center">
-                        <i class="fas fa-truck fa-2x mb-3 text-primary"></i>
-                        <h5>4. Delivery</h5>
-                        <p>Blood is delivered to requesting hospital</p>
+                    <h5 class="mb-2">3. Plan Route</h5>
+                    <p class="text-muted small">Calculate optimal delivery route for drone</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                        <i class="fas fa-truck"></i>
                     </div>
+                    <h5 class="mb-2">4. Execute Delivery</h5>
+                    <p class="text-muted small">Drone delivers blood to requesting hospital</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Technology Highlights -->
+<div class="row mb-5">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h5 class="mb-3">Route Optimization</h5>
+                <p class="text-muted">Developing algorithms to optimize delivery routes considering weather, traffic, and urgency levels.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h5 class="mb-3">Safety Systems</h5>
+                <p class="text-muted">Implementing safety protocols and collision avoidance systems for medical drone operations.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="card bg-gradient-primary text-white text-center fade-in-up">
+    <div class="card-body py-5">
+        <h3 class="mb-3">Ready to Test?</h3>
+        <p class="mb-4 opacity-75">Explore the drone blood delivery project prototype</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ url_for('request_blood') }}" class="btn btn-light btn-lg">
+                <i class="fas fa-tint me-2"></i>Test Request System
+            </a>
+            <a href="{{ url_for('drone_status') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-satellite-dish me-2"></i>Monitor Drones
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+}
+</style>
 {% endblock %} 

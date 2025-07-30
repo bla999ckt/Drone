@@ -1,47 +1,108 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card mb-4">
+<!-- Header Section -->
+<div class="text-center mb-5 fade-in-up">
+    <div class="feature-icon mx-auto mb-4" style="width: 100px; height: 100px; font-size: 2.5rem;">
+        <i class="fas fa-hospital"></i>
+    </div>
+    <h1 class="hero-title" style="font-size: 2.5rem; color: var(--gray-900);">Hospital Management</h1>
+    <p class="hero-subtitle" style="color: var(--gray-600);">Add, edit, and manage registered hospitals in the system</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-md-12">
+        <!-- Add Hospital Form -->
+        <div class="card mb-5 fade-in-up">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Add New Hospital</h3>
+            </div>
             <div class="card-body">
-                <h2 class="card-title">Manage Hospitals</h2>
-                <form method="POST" action="{{ url_for('add_hospital') }}" class="row g-3 mb-4">
+                <form method="POST" action="{{ url_for('add_hospital') }}" class="needs-validation" novalidate>
+                    <div class="row g-3">
                     <div class="col-md-4">
-                        <input type="text" class="form-control" name="name" placeholder="Hospital Name" required>
+                            <label for="name" class="form-label">
+                                <i class="fas fa-hospital me-1"></i>Hospital Name
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="Enter hospital name" required>
+                            <div class="invalid-feedback">
+                                Please enter a hospital name.
+                            </div>
                     </div>
                     <div class="col-md-3">
-                        <input type="number" step="any" class="form-control" name="latitude" placeholder="Latitude" required>
+                            <label for="latitude" class="form-label">
+                                <i class="fas fa-map-marker-alt me-1"></i>Latitude
+                            </label>
+                            <input type="number" step="any" class="form-control form-control-lg" id="latitude" name="latitude" placeholder="e.g., 35.8617" required>
+                            <div class="invalid-feedback">
+                                Please enter a valid latitude.
+                            </div>
                     </div>
                     <div class="col-md-3">
-                        <input type="number" step="any" class="form-control" name="longitude" placeholder="Longitude" required>
+                            <label for="longitude" class="form-label">
+                                <i class="fas fa-map-marker-alt me-1"></i>Longitude
+                            </label>
+                            <input type="number" step="any" class="form-control form-control-lg" id="longitude" name="longitude" placeholder="e.g., 104.1954" required>
+                            <div class="invalid-feedback">
+                                Please enter a valid longitude.
+                            </div>
                     </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-plus"></i> Add
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-plus me-1"></i>Add
                         </button>
+                        </div>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Hospitals List -->
+        <div class="card fade-in-up" style="animation-delay: 0.2s;">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-list me-2"></i>Registered Hospitals</h3>
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                                <th>Actions</th>
+                                <th><i class="fas fa-hospital me-1"></i>Hospital Name</th>
+                                <th><i class="fas fa-map-marker-alt me-1"></i>Latitude</th>
+                                <th><i class="fas fa-map-marker-alt me-1"></i>Longitude</th>
+                                <th><i class="fas fa-cog me-1"></i>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for hospital in hospitals %}
                             <tr>
-                                <form method="POST" action="{{ url_for('edit_hospital', hospital_id=hospital.id) }}">
-                                    <td><input type="text" class="form-control" name="name" value="{{ hospital.name }}" required></td>
-                                    <td><input type="number" step="any" class="form-control" name="latitude" value="{{ hospital.latitude }}" required></td>
-                                    <td><input type="number" step="any" class="form-control" name="longitude" value="{{ hospital.longitude }}" required></td>
+                                <form method="POST" action="{{ url_for('edit_hospital', hospital_id=hospital.id) }}" class="hospital-edit-form">
                                     <td>
-                                        <button type="submit" class="btn btn-success btn-sm me-2"><i class="fas fa-save"></i> Save</button>
-                                        <a href="{{ url_for('delete_hospital', hospital_id=hospital.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this hospital?');"><i class="fas fa-trash"></i> Delete</a>
+                                        <div class="d-flex align-items-center">
+                                            <div class="feature-icon me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                                <i class="fas fa-hospital"></i>
+                                            </div>
+                                            <input type="text" class="form-control" name="name" value="{{ hospital.name }}" required>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="number" step="any" class="form-control" name="latitude" value="{{ hospital.latitude }}" required>
+                                    </td>
+                                    <td>
+                                        <input type="number" step="any" class="form-control" name="longitude" value="{{ hospital.longitude }}" required>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="submit" class="btn btn-success" title="Save Changes">
+                                                <i class="fas fa-save"></i>
+                                            </button>
+                                            <a href="{{ url_for('delete_hospital', hospital_id=hospital.id) }}" 
+                                               class="btn btn-danger" 
+                                               onclick="return confirm('Are you sure you want to delete this hospital? This action cannot be undone.');"
+                                               title="Delete Hospital">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </form>
                             </tr>
@@ -51,6 +112,110 @@
                 </div>
             </div>
         </div>
+
+        <!-- Information Cards -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h5>GPS Coordinates</h5>
+                        <p class="text-muted small">Accurate location data ensures optimal drone routing</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h5>Data Validation</h5>
+                        <p class="text-muted small">All coordinates are validated for accuracy and safety</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <h5>Real-time Updates</h5>
+                        <p class="text-muted small">Changes are immediately reflected in the delivery system</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Enhanced form interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Add visual feedback for coordinate inputs
+    const coordInputs = document.querySelectorAll('input[name="latitude"], input[name="longitude"]');
+    coordInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            if (this.name === 'latitude' && (value < -90 || value > 90)) {
+                this.classList.add('border-danger');
+                this.setCustomValidity('Latitude must be between -90 and 90');
+            } else if (this.name === 'longitude' && (value < -180 || value > 180)) {
+                this.classList.add('border-danger');
+                this.setCustomValidity('Longitude must be between -180 and 180');
+            } else {
+                this.classList.remove('border-danger');
+                this.setCustomValidity('');
+            }
+        });
+    });
+
+    // Add confirmation for delete actions
+    const deleteButtons = document.querySelectorAll('a[href*="delete_hospital"]');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to delete this hospital? This action cannot be undone.')) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Add success feedback for form submissions
+    const editForms = document.querySelectorAll('.hospital-edit-form');
+    editForms.forEach(form => {
+        form.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            submitBtn.disabled = true;
+            
+            // Reset button after a short delay (simulating server response)
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        });
+    });
+});
+</script>
 {% endblock %} 

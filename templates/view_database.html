@@ -1,100 +1,268 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12 mb-4">
-        <div class="card">
+<!-- Header Section -->
+<div class="text-center mb-5 fade-in-up">
+    <div class="feature-icon mx-auto mb-4" style="width: 100px; height: 100px; font-size: 2.5rem;">
+        <i class="fas fa-database"></i>
+    </div>
+    <h1 class="hero-title" style="font-size: 2.5rem; color: var(--gray-900);">System Database</h1>
+    <p class="hero-subtitle" style="color: var(--gray-600);">Comprehensive view of hospitals, inventory, and blood requests</p>
+</div>
+
+<!-- Stats Overview -->
+<div class="row mb-5 fade-in-up">
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="card text-center h-100">
             <div class="card-body">
-                <h2 class="card-title">Hospitals</h2>
+                <div class="feature-icon">
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <h3 class="text-gradient">{{ hospitals|length }}</h3>
+                <p class="text-muted mb-0">Total Hospitals</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="feature-icon">
+                    <i class="fas fa-tint"></i>
+                </div>
+                <h3 class="text-gradient">{{ inventory|length }}</h3>
+                <p class="text-muted mb-0">Inventory Items</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="feature-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h3 class="text-gradient">{{ requests|length }}</h3>
+                <p class="text-muted mb-0">Total Requests</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="feature-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="text-gradient">{{ requests|selectattr('status', 'equalto', 'completed')|list|length }}</h3>
+                <p class="text-muted mb-0">Completed</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hospitals Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card fade-in-up">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-hospital me-2"></i>Registered Hospitals</h3>
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
+                                <th><i class="fas fa-hashtag me-1"></i>ID</th>
+                                <th><i class="fas fa-hospital me-1"></i>Hospital Name</th>
+                                <th><i class="fas fa-map-marker-alt me-1"></i>Latitude</th>
+                                <th><i class="fas fa-map-marker-alt me-1"></i>Longitude</th>
+                                <th><i class="fas fa-cog me-1"></i>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for hospital in hospitals %}
                             <tr>
-                                <td>{{ hospital.id }}</td>
-                                <td>{{ hospital.name }}</td>
-                                <td>{{ hospital.latitude }}</td>
-                                <td>{{ hospital.longitude }}</td>
+                                <td><span class="badge bg-primary">{{ hospital.id }}</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="feature-icon me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                            <i class="fas fa-hospital"></i>
+                                        </div>
+                                        <strong>{{ hospital.name }}</strong>
+                                    </div>
+                                </td>
+                                <td><code>{{ "%.6f"|format(hospital.latitude) }}</code></td>
+                                <td><code>{{ "%.6f"|format(hospital.longitude) }}</code></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewHospitalDetails({{ hospital.id }})">
+                                        <i class="fas fa-eye me-1"></i>View
+                                    </button>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-12 mb-4">
-        <div class="card">
+<!-- Blood Inventory Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card fade-in-up" style="animation-delay: 0.2s;">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-tint me-2"></i>Blood Inventory</h3>
+            </div>
             <div class="card-body">
-                <h2 class="card-title">Blood Inventory</h2>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Hospital</th>
-                                <th>Blood Type</th>
-                                <th>Units</th>
-                                <th>Last Updated</th>
+                                <th><i class="fas fa-hospital me-1"></i>Hospital</th>
+                                <th><i class="fas fa-tint me-1"></i>Blood Type</th>
+                                <th><i class="fas fa-cubes me-1"></i>Units</th>
+                                <th><i class="fas fa-clock me-1"></i>Last Updated</th>
+                                <th><i class="fas fa-chart-line me-1"></i>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in inventory %}
                             <tr>
-                                <td>{{ item.hospital.name }}</td>
-                                <td>{{ item.blood_type }}</td>
-                                <td>{{ item.units }}</td>
-                                <td>{{ item.last_updated.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="feature-icon me-2" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                                            <i class="fas fa-hospital"></i>
+                                        </div>
+                                        {{ item.hospital.name }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger">{{ item.blood_type }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="fw-bold me-2">{{ item.units }}</span>
+                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {{ (item.units / 100) * 100 }}%; background: linear-gradient(135deg, var(--accent-color), var(--accent-light));"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ item.last_updated.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                </td>
+                                <td>
+                                    {% if item.units > 50 %}
+                                        <span class="badge bg-success">High Stock</span>
+                                    {% elif item.units > 20 %}
+                                        <span class="badge bg-warning">Medium Stock</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Low Stock</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-12">
-        <div class="card">
+<!-- Blood Requests Section -->
+<div class="row">
+    <div class="col-12">
+        <div class="card fade-in-up" style="animation-delay: 0.4s;">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Blood Requests</h3>
+            </div>
             <div class="card-body">
-                <h2 class="card-title">Blood Requests</h2>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Hospital</th>
-                                <th>Blood Type</th>
-                                <th>Units</th>
-                                <th>Urgency</th>
-                                <th>Status</th>
-                                <th>Created At</th>
+                                <th><i class="fas fa-hospital me-1"></i>Hospital</th>
+                                <th><i class="fas fa-tint me-1"></i>Blood Type</th>
+                                <th><i class="fas fa-cubes me-1"></i>Units</th>
+                                <th><i class="fas fa-exclamation-triangle me-1"></i>Urgency</th>
+                                <th><i class="fas fa-info-circle me-1"></i>Status</th>
+                                <th><i class="fas fa-clock me-1"></i>Created At</th>
+                                <th><i class="fas fa-cog me-1"></i>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for request in requests %}
                             <tr>
-                                <td>{{ request.hospital.name }}</td>
-                                <td>{{ request.blood_type }}</td>
-                                <td>{{ request.units }}</td>
                                 <td>
-                                    <span class="badge {% if request.urgency == 'critical' %}bg-danger{% elif request.urgency == 'urgent' %}bg-warning{% else %}bg-info{% endif %}">
-                                        {{ request.urgency }}
-                                    </span>
+                                    <div class="d-flex align-items-center">
+                                        <div class="feature-icon me-2" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                                            <i class="fas fa-hospital"></i>
+                                        </div>
+                                        {{ request.hospital.name }}
+                                    </div>
                                 </td>
                                 <td>
-                                    <span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'in_progress' %}bg-primary{% elif request.status == 'completed' %}bg-success{% else %}bg-secondary{% endif %}">
-                                        {{ request.status }}
-                                    </span>
+                                    <span class="badge bg-danger">{{ request.blood_type }}</span>
                                 </td>
-                                <td>{{ request.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    <span class="fw-bold">{{ request.units }}</span>
+                                </td>
+                                <td>
+                                    {% if request.urgency == 'critical' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Critical
+                                        </span>
+                                    {% elif request.urgency == 'urgent' %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-clock me-1"></i>Urgent
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-info-circle me-1"></i>Normal
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if request.status == 'pending' %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-clock me-1"></i>Pending
+                                        </span>
+                                    {% elif request.status == 'in_progress' %}
+                                        <span class="badge bg-primary">
+                                            <i class="fas fa-plane me-1"></i>In Progress
+                                        </span>
+                                    {% elif request.status == 'completed' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Completed
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-question-circle me-1"></i>{{ request.status }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ request.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-primary" onclick="viewRequestDetails({{ request.id }})">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        {% if request.status == 'pending' %}
+                                        <button class="btn btn-outline-success" onclick="processRequest({{ request.id }})">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -104,4 +272,42 @@
         </div>
     </div>
 </div>
+
+<script>
+function viewHospitalDetails(hospitalId) {
+    // Implement hospital details modal
+    alert('Viewing details for hospital ID: ' + hospitalId);
+}
+
+function viewRequestDetails(requestId) {
+    // Implement request details modal
+    alert('Viewing details for request ID: ' + requestId);
+}
+
+function processRequest(requestId) {
+    // Implement request processing
+    if (confirm('Process this blood request?')) {
+        alert('Processing request ID: ' + requestId);
+    }
+}
+
+// Add search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Add search boxes to tables
+    const tables = document.querySelectorAll('.table');
+    tables.forEach(table => {
+        const thead = table.querySelector('thead');
+        if (thead) {
+            const searchRow = document.createElement('tr');
+            const cells = thead.querySelector('tr').children.length;
+            for (let i = 0; i < cells; i++) {
+                const cell = document.createElement('th');
+                cell.innerHTML = '<input type="text" class="form-control form-control-sm" placeholder="Search...">';
+                searchRow.appendChild(cell);
+            }
+            thead.appendChild(searchRow);
+        }
+    });
+});
+</script>
 {% endblock %} 
