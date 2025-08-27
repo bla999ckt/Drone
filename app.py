@@ -665,12 +665,45 @@ def auto_start_mission():
     mission = select_best_mission()
     if mission:
         req = BloodRequest.query.get(mission['id'])
+        # Error handling: prevent source == destination
+        if mission['from_hospital']['name'] == mission['to_hospital']['name']:
+            logging.error(f"Invalid mission: source and destination hospital are the same ({mission['from_hospital']['name']})")
+            req.status = 'error'
+            db.session.commit()
+            emit_mission_queue_update()
+            return
+        # Safety check before sending commands
+        src = mission['from_hospital']
+        dest = mission['to_hospital']
+        drone_status = get_drone_status()
+        mission_params = {
+            'battery_level': drone_status['battery_level'],
+            'wind_speed': 0,  # Add real wind speed if available
+            'visibility': 10000,  # Add real visibility if available
+            'start_location': (src['lat'], src['lon']),
+            'destination': (dest['lat'], dest['lon']),
+            'planned_altitude': 20
+        }
+        if not safety_monitor.is_mission_safe(mission_params):
+            logging.error(f"Mission failed safety check: {mission_params}")
+            req.status = 'error'
+            db.session.commit()
+            emit_mission_queue_update()
+            return
         if req.status == 'pending':
             req.status = 'scheduled'  # Mark as started
             db.session.commit()
             emit_mission_queue_update()
             logging.info(f"Mission auto-started: Request ID {req.id}, Status set to scheduled.")
-            # Here you could trigger drone delivery logic if needed
+            # Send MAVLink commands to Pixhawk
+            try:
+                drone.arm_and_takeoff(target_altitude=20)
+                drone.goto_location(lat=src['lat'], lon=src['lon'], alt=20)
+                drone.goto_location(lat=dest['lat'], lon=dest['lon'], alt=20)
+                drone.return_to_launch()
+                logging.info(f"Mission commands sent to Pixhawk: Takeoff, fly to {src['name']}, deliver to {dest['name']}, return to launch.")
+            except Exception as e:
+                logging.error(f"Error sending MAVLink commands: {e}")
 
 # WebSocket events
 @socketio.on('connect')

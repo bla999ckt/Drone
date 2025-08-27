@@ -167,3 +167,86 @@ Example no-fly zones:
 This guide ensures anyone can set up and run the Blood Delivery Drone System on a Raspberry Pi/Orange Pi, making it accessible as a server for everyone on the network.
 
 For more details, see the official documentation and community forums in the resources section.
+
+## MAVLink Mission Commands: How Missions Are Sent to Pixhawk
+
+When a blood delivery mission is scheduled, the Flask backend sends a series of MAVLink commands to Pixhawk using the `DroneController` class. Here’s how it works:
+
+### Command Sequence
+1. **Arm and Takeoff**
+   - Command: `MAV_CMD_COMPONENT_ARM_DISARM` (arm motors)
+   - Command: `MAV_CMD_NAV_TAKEOFF` (take off to target altitude)
+2. **Fly to Source Hospital**
+   - Command: `MAV_CMD_NAV_WAYPOINT` (fly to source hospital coordinates)
+3. **Fly to Destination Hospital**
+   - Command: `MAV_CMD_NAV_WAYPOINT` (fly to destination hospital coordinates)
+4. **Return to Launch**
+   - Command: `MAV_CMD_NAV_RETURN_TO_LAUNCH` (return to home/base)
+
+### Example Python Code
+```python
+# Arm and takeoff
+self.master.mav.command_long_send(
+    self.master.target_system,
+    self.master.target_component,
+    mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+    0, 1, 0, 0, 0, 0, 0, 0)
+self.master.mav.command_long_send(
+    self.master.target_system,
+    self.master.target_component,
+    mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+    0, 0, 0, 0, 0, 0, 0, target_altitude)
+
+# Fly to waypoint
+self.master.mav.command_long_send(
+    self.master.target_system,
+    self.master.target_component,
+    mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+    0, 0, 0, 0, 0, 0, lat, lon)
+
+# Return to launch
+self.master.mav.command_long_send(
+    self.master.target_system,
+    self.master.target_component,
+    mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+    0, 0, 0, 0, 0, 0, 0, 0)
+```
+
+### How Pixhawk Interprets These Commands
+- **Arm/Disarm:** Pixhawk arms the motors, preparing for flight.
+- **Takeoff:** Pixhawk takes off to the specified altitude.
+- **Waypoint:** Pixhawk navigates to the given GPS coordinates.
+- **Return to Launch:** Pixhawk returns to its home location and lands.
+
+### Safety & Error Handling
+- The backend checks for invalid missions (e.g., source and destination are the same) and will not send commands in such cases.
+- The safety monitor checks for no-fly zones before sending commands.
+- All actions and errors are logged in `drone_operations.log` for review.
+
+See `drone_controller.py` for full implementation details.
+
+## Cellular/Remote MAVLink Control: SIM Card and Pixhawk
+
+**Can you put a SIM card in Pixhawk?**
+- No, Pixhawk does not have a SIM card slot or built-in cellular modem.
+- Pixhawk only receives MAVLink commands via USB, telemetry radio, or serial ports.
+
+**How to send MAVLink commands remotely using cellular (SIM card):**
+- Use a companion computer (e.g., Raspberry Pi or Orange Pi) with a cellular modem/SIM card.
+- The companion computer connects to Pixhawk via USB or serial and runs the Flask app or MAVLink relay.
+- Your PC or server sends MAVLink commands over the internet to the companion computer.
+- The companion computer relays commands to Pixhawk, which executes them as usual.
+
+**Typical setup:**
+1. Insert SIM card into a 4G/LTE USB modem or HAT on Raspberry Pi/Orange Pi.
+2. Connect Pi to Pixhawk via USB/serial.
+3. Run the Flask app or MAVProxy on the Pi.
+4. Send commands from your PC/server to the Pi (using public IP, VPN, or reverse SSH).
+5. Pi relays MAVLink commands to Pixhawk.
+
+**Summary:**
+- SIM card goes in the companion computer, not Pixhawk.
+- Pixhawk acts on MAVLink commands received from the companion computer.
+- This enables remote control and telemetry over cellular networks.
+
+For more details, see the companion computer and MAVProxy documentation.
