@@ -11,7 +11,7 @@
 </div>
 
 <div class="row">
-    <!-- Map Section -->
+    <!-- Map Section + Mission Queue -->
     <div class="col-lg-8 mb-4">
         <div class="card fade-in-up">
             <div class="card-header">
@@ -19,6 +19,31 @@
             </div>
             <div class="card-body p-0">
                 <div id="map" style="height: 500px; border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);"></div>
+            </div>
+        </div>
+
+        <!-- Mission Queue Section (moved here) -->
+        <div class="card fade-in-up mt-4" style="animation-delay: 1.2s;">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-tasks me-2"></i>Mission Queue</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Priority</th>
+                            <th>Blood Type</th>
+                            <th>Units</th>
+                            <th>Urgency</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mission-queue-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -183,73 +208,18 @@
     </div>
 </div>
 
-<!-- Additional Status Cards -->
+<!-- Drone Log Section -->
 <div class="row mt-4">
-    <div class="col-md-6 mb-4">
-        <div class="card fade-in-up" style="animation-delay: 0.6s;">
+    <div class="col-md-12 mb-4">
+        <div class="card fade-in-up" style="animation-delay: 1s;">
             <div class="card-header">
-                <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>System Performance</h4>
+                <h4 class="mb-0"><i class="fas fa-file-alt me-2"></i>Recent Drone Log</h4>
             </div>
             <div class="card-body">
-                <div class="performance-metrics">
-                    <div class="metric-item">
-                        <div class="metric-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="metric-content">
-                            <span class="metric-value">85.2%</span>
-                            <span class="metric-label">Test Uptime</span>
-                        </div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-icon">
-                            <i class="fas fa-route"></i>
-                        </div>
-                        <div class="metric-content">
-                            <span class="metric-value">23</span>
-                            <span class="metric-label">Test Runs</span>
-                        </div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-icon">
-                            <i class="fas fa-tachometer-alt"></i>
-                        </div>
-                        <div class="metric-content">
-                            <span class="metric-value">28.3 min</span>
-                            <span class="metric-label">Avg Test Time</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6 mb-4">
-        <div class="card fade-in-up" style="animation-delay: 0.8s;">
-            <div class="card-header">
-                <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Alerts & Notifications</h4>
-            </div>
-            <div class="card-body">
-                <div class="alerts-list">
-                    <div class="alert-item">
-                        <div class="alert-icon">
-                            <i class="fas fa-info-circle text-info"></i>
-                        </div>
-                        <div class="alert-content">
-                            <span class="alert-message">Development system running normally</span>
-                            <span class="alert-time">2 min ago</span>
-                        </div>
-                    </div>
-                    <div class="alert-item">
-                        <div class="alert-icon">
-                            <i class="fas fa-check-circle text-success"></i>
-                        </div>
-                        <div class="alert-content">
-                            <span class="alert-message">Test run #23 completed successfully</span>
-                            <span class="alert-time">15 min ago</span>
-                        </div>
-                    </div>
-                </div>
+                <pre id="drone-log" style="background:#f8f9fa; max-height:200px; overflow:auto; font-size:0.95em; border-radius:6px; padding:12px;">Loading...</pre>
+                <button class="btn btn-outline-secondary btn-sm mt-2" onclick="refreshDroneLog()">
+                    <i class="fas fa-sync-alt me-1"></i>Refresh Log
+                </button>
             </div>
         </div>
     </div>
@@ -425,87 +395,23 @@
     color: var(--gray-900);
 }
 
-/* Performance Metrics */
-.performance-metrics {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+/* Drone Log */
+#drone-log {
+    background: #f8f9fa;
+    max-height: 200px;
+    overflow: auto;
+    font-size: 0.95em;
+    border-radius: 6px;
+    padding: 12px;
 }
 
-.metric-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    background: var(--gray-50);
-    border-radius: var(--border-radius);
-    border: 1px solid var(--gray-200);
+/* Mission Queue */
+.table-hover tbody tr:hover {
+    background-color: #f1f5f9;
 }
 
-.metric-icon {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1rem;
-}
-
-.metric-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.metric-value {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--gray-900);
-}
-
-.metric-label {
-    font-size: 0.875rem;
-    color: var(--gray-600);
-}
-
-/* Alerts */
-.alerts-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.alert-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: var(--gray-50);
-    border-radius: var(--border-radius);
-    border: 1px solid var(--gray-200);
-}
-
-.alert-icon {
-    font-size: 1.25rem;
-}
-
-.alert-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.alert-message {
-    font-weight: 500;
-    color: var(--gray-900);
-}
-
-.alert-time {
-    font-size: 0.875rem;
-    color: var(--gray-600);
+.table th, .table td {
+    vertical-align: middle;
 }
 
 /* Responsive Design */
@@ -663,6 +569,15 @@ function updateDroneStatus(data) {
     
     // Update mission information
     updateMissionInfo(data.mission, data.is_available, data.is_charging);
+    // Update mission timeline step based on mission_phase
+    if (data.mission_phase) {
+        updateMissionStatusByPhase(data.mission_phase);
+    } else if (data.mission && data.mission.status) {
+        // Fallback: use mission.status if mission_phase not provided
+        updateMissionStatusByPhase(data.mission.status);
+    } else {
+        updateMissionStatusByPhase(null); // No active mission
+    }
     
     // Update movement status
     updateMovementStatus(data.is_moving);
@@ -925,7 +840,6 @@ function viewPendingRequests() {
                 } else {
                     message += 'No pending requests';
                 }
-                
                 alert(message);
             } else {
                 alert('Error getting requests: ' + data.message);
@@ -937,21 +851,90 @@ function viewPendingRequests() {
         });
 }
 
-// Update mission status
-function updateMissionStatus(step) {
+function updateMissionStatusByPhase(phase) {
+    // Map backend phase/status to timeline step index
+    const phaseMap = {
+        'takeoff': 0,
+        'pickup': 1,
+        'pickup_blood': 1,
+        'delivery': 2,
+        'return': 3,
+        'return_home': 3,
+        'completed': 4,
+        'pending': -1,
+        'none': -1,
+        null: -1
+    };
+    let step = phaseMap[phase] !== undefined ? phaseMap[phase] : -1;
     const steps = document.querySelectorAll('.mission-step');
     steps.forEach((s, index) => {
-        if (index < step) {
-            s.querySelector('i').className = 'fas fa-check-circle text-success';
+        // Reset all icons and text
+        const icon = s.querySelector('.step-icon i');
+        const time = s.querySelector('.step-time');
+        s.classList.remove('completed', 'active');
+        if (step === -1) {
+            // No active mission
+            icon.className = 'fas fa-circle';
+            time.textContent = 'Pending';
+        } else if (index < step) {
             s.classList.add('completed');
+            icon.className = 'fas fa-check-circle';
+            time.textContent = 'Completed';
         } else if (index === step) {
-            s.querySelector('i').className = 'fas fa-spinner fa-spin text-primary';
             s.classList.add('active');
+            icon.className = 'fas fa-circle pulse';
+            time.textContent = 'In Progress';
         } else {
-            s.querySelector('i').className = 'fas fa-circle text-muted';
-            s.classList.remove('active', 'completed');
+            icon.className = 'fas fa-circle';
+            time.textContent = 'Pending';
         }
     });
 }
+
+// Refresh drone log
+function refreshDroneLog() {
+    fetch('/drone_log').then(r => r.json()).then(data => {
+        document.getElementById('drone-log').textContent = (data.logs && data.logs.length) ? data.logs.join('\n') : 'No recent log entries.';
+    });
+}
+
+// Mission Queue functions
+function fetchMissionQueue() {
+    fetch('/mission-queue')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('mission-queue-body');
+            tbody.innerHTML = '';
+            if (data.missions && data.missions.length > 0) {
+                data.missions.forEach((mission, idx) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${idx + 1}</td>
+                        <td>${mission.blood_type}</td>
+                        <td>${mission.units}</td>
+                        <td>${mission.urgency}</td>
+                        <td>${mission.from_hospital.name}</td>
+                        <td>${mission.to_hospital.name}</td>
+                        <td>${mission.status}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="7" class="text-center">No pending missions</td>';
+                tbody.appendChild(row);
+            }
+        });
+}
+
+document.addEventListener('DOMContentLoaded', fetchMissionQueue);
+
+// SocketIO: Listen for mission_queue_update and refresh instantly
+if (typeof io !== 'undefined') {
+    const socket = io();
+    socket.on('mission_queue_update', function() {
+        fetchMissionQueue();
+    });
+}
 </script>
-{% endblock %} 
+{% endblock %}

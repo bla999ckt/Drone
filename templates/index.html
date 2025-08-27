@@ -10,7 +10,7 @@
             <a href="{{ url_for('request_blood') }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-tint me-2"></i>Request Blood
             </a>
-            <a href="{{ url_for('drone_status') }}" class="btn btn-outline-light btn-lg">
+            <a href="{{ url_for('drone_status_page') }}" class="btn btn-outline-light btn-lg">
                 <i class="fas fa-satellite-dish me-2"></i>View Drone Status
             </a>
         </div>
@@ -189,7 +189,7 @@
             <a href="{{ url_for('request_blood') }}" class="btn btn-light btn-lg">
                 <i class="fas fa-tint me-2"></i>Test Request System
             </a>
-            <a href="{{ url_for('drone_status') }}" class="btn btn-outline-light btn-lg">
+            <a href="{{ url_for('drone_status_page') }}" class="btn btn-outline-light btn-lg">
                 <i class="fas fa-satellite-dish me-2"></i>Monitor Drones
             </a>
         </div>
@@ -201,4 +201,4 @@
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
 }
 </style>
-{% endblock %} 
+{% endblock %}

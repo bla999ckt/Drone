@@ -1,0 +1,25 @@
+{
+    "no_fly_zones": [
+        {
+            "name": "Airport Zone 1",
+            "lat": 37.7749,
+            "lon": -122.4194,
+            "radius": 5,
+            "reason": "Airport proximity"
+        },
+        {
+            "name": "Government Building",
+            "lat": 37.7694,
+            "lon": -122.4862,
+            "radius": 1,
+            "reason": "Restricted airspace"
+        },
+        {
+            "name": "Stadium",
+            "lat": 37.7786,
+            "lon": -122.3892,
+            "radius": 0.5,
+            "reason": "Public gathering space"
+        }
+    ]
+}

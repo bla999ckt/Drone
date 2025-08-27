@@ -67,6 +67,22 @@
                         </div>
                     </div>
 
+                    <!-- Hospital Selection -->
+                    <div class="mb-4">
+                        <label for="hospital_id" class="form-label">
+                            <i class="fas fa-hospital me-2"></i>Select Hospital
+                        </label>
+                        <select class="form-select form-select-lg" id="hospital_id" name="hospital_id" required>
+                            <option value="">Choose your hospital...</option>
+                            {% for hospital in hospitals %}
+                            <option value="{{ hospital.id }}">{{ hospital.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a hospital.
+                        </div>
+                    </div>
+
                     <!-- Additional Notes -->
                     <div class="mb-4">
                         <label for="notes" class="form-label">
@@ -170,4 +186,4 @@ document.getElementById('urgency').addEventListener('change', function() {
     }
 });
 </script>
-{% endblock %} 
+{% endblock %}

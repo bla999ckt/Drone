@@ -1,198 +1,169 @@
-# Drone Programming Guide for Blood Delivery System
+# Drone Setup & Integration Guide
 
-## Table of Contents
-1. [Introduction to Pixhawk 6X](#introduction-to-pixhawk-6x)
-2. [Required Hardware](#required-hardware)
-3. [Software Setup](#software-setup)
-4. [Basic Drone Programming](#basic-drone-programming)
-5. [Integration with Blood Delivery System](#integration-with-blood-delivery-system)
-6. [Safety Considerations](#safety-considerations)
+## Setting Up Pixhawk for Blood Delivery
 
-## Introduction to Pixhawk 6X
+1. **Hardware Assembly**
+   - Connect Pixhawk 6X to your computer via USB.
+   - Attach GPS module and telemetry radio if available.
+   - Power Pixhawk with a battery or USB.
 
-The Pixhawk 6X is an advanced flight controller that serves as the brain of your drone. It's designed to handle complex flight operations and can be programmed to perform autonomous missions.
+2. **Software Installation**
+   - Install [QGroundControl](https://docs.qgroundcontrol.com/master/en/getting_started/download_and_install.html) for initial configuration.
+   - Optionally, install [Mission Planner](https://ardupilot.org/planner/) for advanced mission planning.
 
-### Key Features
-- Advanced flight control algorithms
-- GPS navigation
-- Multiple flight modes
-- Telemetry capabilities
-- Mission planning support
+3. **Basic Configuration**
+   - Open QGroundControl and follow the setup wizard:
+     - Calibrate sensors
+     - Configure flight modes
+     - Set up failsafe procedures
+     - Configure GPS
 
-## Required Hardware
+## Linking Pixhawk to the Flask App
 
-1. **Pixhawk 6X Flight Controller**
-2. **GPS Module** (usually comes with Pixhawk)
-3. **Telemetry Radio** (for ground control communication)
-4. **Power Distribution Board**
-5. **Electronic Speed Controllers (ESCs)**
-6. **Motors**
-7. **Propellers**
-8. **Battery**
-9. **Frame**
-10. **RC Receiver** (for manual control backup)
+1. **Install Python Dependencies**
+   - In your project directory, run:
 
-## Software Setup
+     ```bash
+     pip install -r requirements.txt
+     ```
 
-### 1. Install Required Software
-- **QGroundControl**: Main ground control station software
-  - Download from: https://docs.qgroundcontrol.com/master/en/getting_started/download_and_install.html
-- **Mission Planner**: Alternative ground control station
-  - Download from: https://ardupilot.org/planner/
+2. **Connect Pixhawk to Flask**
+   - Ensure Pixhawk is connected via USB (e.g., `/dev/tty.usbmodem14203` on macOS).
+   - In `app.py`, the drone controller is initialized:
 
-### 2. Basic Configuration Steps
-1. Connect Pixhawk to computer via USB
-2. Open QGroundControl
-3. Follow the setup wizard to:
-   - Calibrate sensors
-   - Configure flight modes
-   - Set up failsafe procedures
-   - Configure GPS
+     ```python
+     drone = DroneController(connection_string='/dev/tty.usbmodem14203')
+     ```
 
-## Basic Drone Programming
+3. **Test Connection**
+   - Use the web interface or run:
 
-### 1. Understanding Flight Modes
-- **Stabilize**: Basic flight mode for manual control
-- **Loiter**: Maintains position using GPS
-- **RTL**: Return to Launch
-- **Auto**: Follows pre-programmed mission
-- **Guided**: Follows commands from ground control
+     ```bash
+     python test_connection.py --port /dev/tty.usbmodem14203
+     ```
+   - Confirm connection and heartbeat.
 
-### 2. Creating a Basic Mission
-1. Open QGroundControl
-2. Go to Plan view
-3. Add waypoints by clicking on the map
-4. Set actions for each waypoint:
-   - Take off
-   - Change altitude
-   - Land
-   - Wait
-   - etc.
+4. **Run the Flask App**
+   - Start the server:
 
-### 3. Basic Python Code Example
+     ```bash
+     python app.py
+     ```
+   - Open [http://localhost:5000](http://localhost:5000) in your browser.
+
+## What You Can Test With Pixhawk Alone
+- Connection and status monitoring
+- Battery and GPS reporting
+- Mission planning and selection
+- Command simulation (arming, takeoff, waypoint)
+- Safety checks and logs
+
+## Safety & Best Practices
+- Always check battery, GPS, and weather before flight.
+- Use the web dashboard to monitor status and logs.
+- Follow local regulations and register your drone.
+
+## Raspberry Pi / Orange Pi Deployment
+
+This guide explains how to set up the Blood Delivery Drone System on a Raspberry Pi or Orange Pi and make it accessible to everyone on your network.
+
+### Hardware Needed
+- Raspberry Pi 3/4 or Orange Pi
+- MicroSD card (16GB+)
+- Power supply
+- Pixhawk flight controller (USB connection)
+
+### Software Setup
+1. **Install OS:** Use Raspberry Pi OS (for Pi) or Armbian (for Orange Pi).
+2. **Connect to Internet:** WiFi or Ethernet.
+3. **Update system:**
+   ```sh
+   sudo apt update && sudo apt upgrade -y
+   ```
+4. **Install Python 3 and pip:**
+   ```sh
+   sudo apt install python3 python3-pip -y
+   ```
+5. **Clone the repository:**
+   ```sh
+   git clone https://github.com/yourusername/Drone.git
+   cd Drone
+   ```
+6. **Install Python dependencies:**
+   ```sh
+   pip3 install -r requirements.txt
+   ```
+7. **Connect Pixhawk:**
+   - Plug Pixhawk into USB.
+   - Find device path (e.g., `/dev/ttyACM0`).
+   - Update `app.py` with correct `connection_string`.
+
+### Running the Flask App as a Server
+- Start the app so it's accessible to everyone:
+  ```sh
+  python3 app.py
+  ```
+- Find your Pi's IP address:
+  ```sh
+  hostname -I
+  ```
+- Access the dashboard from any device on the network at `http://<raspberrypi_ip>:5000`
+
+### Best Practices
+- Set a static IP for your Pi.
+- Use `nohup` or systemd for auto-restart.
+- Open port 5000 in your firewall.
+- For remote access, use port forwarding or VPN (advanced).
+
+### Troubleshooting
+- Can't access app? Check IP, network, and firewall.
+- Pixhawk not detected? Check USB connection and permissions.
+- See `drone_operations.log` for errors.
+
+## Configuration Instructions
+
+Edit `instance/config.py` to set your Pixhawk connection string and hospital location. For example:
+
 ```python
-from pymavlink import mavutil
-
-# Connect to the drone
-master = mavutil.mavlink_connection('udpin:localhost:14550')
-
-# Wait for the first heartbeat
-master.wait_heartbeat()
-
-# Set mode to GUIDED
-master.mav.command_long_send(
-    master.target_system,
-    master.target_component,
-    mavutil.mavlink.MAV_CMD_DO_SET_MODE,
-    0, 0, 4, 0, 0, 0, 0, 0)
-
-# Arm the drone
-master.mav.command_long_send(
-    master.target_system,
-    master.target_component,
-    mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
-    0, 1, 0, 0, 0, 0, 0, 0)
+CONNECTION_STRING = '/dev/ttyACM0'  # Use your device path
+DEFAULT_HOSPITAL = {
+    'name': 'Your Hospital',
+    'latitude': 12.3456,
+    'longitude': 78.9012
+}
 ```
 
-## Integration with Blood Delivery System
+- Find your Pixhawk device path by running `ls /dev/tty*` after plugging it in.
+- Set your hospital's coordinates and name.
+- Save the file and start the app.
 
-### 1. Connecting to Flask Application
-The drone controller in our Flask application (`drone_controller.py`) uses the MAVLink protocol to communicate with the Pixhawk. Here's how it works:
+# Home Location & No-Fly Zones Setup
 
-1. **Install Required Python Packages**:
-```bash
-pip install pymavlink dronekit
-```
+- Set your drone's home location in `instance/config.py` under `HOME_LOCATION`.
+- Define no-fly zones in `instance/no_fly_zones.json` (edit or replace the example).
 
-2. **Basic Drone Controller Setup**:
+Example home location:
 ```python
-from dronekit import connect, VehicleMode, LocationGlobalRelative
-
-class DroneController:
-    def __init__(self):
-        self.vehicle = None
-        
-    def connect(self):
-        # Connect to the drone
-        self.vehicle = connect('udpin:localhost:14550', wait_ready=True)
-        return True
-        
-    def arm_and_takeoff(self, target_altitude=10):
-        # Basic takeoff sequence
-        self.vehicle.mode = VehicleMode("GUIDED")
-        self.vehicle.armed = True
-        self.vehicle.simple_takeoff(target_altitude)
-        return True
+HOME_LOCATION = {
+    'name': 'Drone Home',
+    'latitude': 40.7128,
+    'longitude': -74.0060
+}
 ```
 
-### 2. Mission Planning
-1. Create waypoints for each hospital
-2. Set up geofencing for safety
-3. Implement failsafe procedures
-4. Add payload management (blood container)
+Example no-fly zones:
+```json
+[
+    {"name": "Airport Zone", "lat": 40.6413, "lon": -73.7781, "radius_km": 5},
+    {"name": "City Center", "lat": 40.7128, "lon": -74.0060, "radius_km": 2}
+]
+```
 
-### 3. Safety Features
-- Return-to-Launch on low battery
-- Geofencing to prevent flying in restricted areas
-- Emergency landing procedures
-- Weather condition monitoring
+- Save your changes and restart the app.
+- For more details, see the rest of this guide.
 
-## Safety Considerations
+---
 
-### 1. Pre-flight Checklist
-- Battery level check
-- GPS signal strength
-- Weather conditions
-- Propeller inspection
-- Payload securement
+This guide ensures anyone can set up and run the Blood Delivery Drone System on a Raspberry Pi/Orange Pi, making it accessible as a server for everyone on the network.
 
-### 2. Emergency Procedures
-- Manual override capability
-- Emergency landing zones
-- Backup power systems
-- Communication redundancy
-
-### 3. Legal Requirements
-- Register your drone with aviation authorities
-- Obtain necessary permits
-- Follow local drone regulations
-- Maintain flight logs
-
-## Next Steps
-
-1. **Start with Basic Setup**:
-   - Assemble the drone
-   - Install and configure QGroundControl
-   - Perform basic flight tests
-
-2. **Learn Basic Programming**:
-   - Study the MAVLink protocol
-   - Practice with simple missions
-   - Understand flight modes
-
-3. **Integration**:
-   - Connect the drone to the Flask application
-   - Test basic commands
-   - Implement safety features
-
-4. **Advanced Features**:
-   - Implement autonomous missions
-   - Add payload management
-   - Set up monitoring systems
-
-## Resources
-
-1. **Official Documentation**:
-   - [ArduPilot Documentation](https://ardupilot.org/)
-   - [Pixhawk User Guide](https://docs.px4.io/master/en/)
-   - [MAVLink Protocol](https://mavlink.io/en/)
-
-2. **Community Forums**:
-   - [ArduPilot Discuss](https://discuss.ardupilot.org/)
-   - [PX4 Forum](https://discuss.px4.io/)
-
-3. **Tutorials**:
-   - [DroneKit Python Guide](https://dronekit-python.readthedocs.io/)
-   - [QGroundControl User Guide](https://docs.qgroundcontrol.com/master/en/)
-
-Remember: Always prioritize safety and start with basic operations before attempting complex missions. Regular maintenance and testing are crucial for reliable operation. 
+For more details, see the official documentation and community forums in the resources section.

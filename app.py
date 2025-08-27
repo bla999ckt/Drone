@@ -11,9 +11,11 @@ import os
 import json
 import threading
 import time
+import re
 
-# Import drone controller
+# Import drone controller and safety monitor
 from drone_controller import DroneController
+from safety_monitor import SafetyMonitor
 
 # Configure logging
 logging.basicConfig(
@@ -28,18 +30,27 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blood_inventory.db'
 db = SQLAlchemy(app)
 socketio = SocketIO(app, async_mode='gevent')
 
-# Only print initialization message once
-if not hasattr(app, '_initialized'):
-    print("Starting application initialization...")
-    app._initialized = True
+# Load configuration from instance/config.py
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'instance'))
+try:
+    import config
+except ImportError:
+    config = None
 
-# Initialize drone controller with the correct port
-# Use the working port we discovered
-drone = DroneController(connection_string='/dev/tty.usbmodem14203')
+# Use config values if available, otherwise fallback to example
+connection_string = getattr(config, 'CONNECTION_STRING', '/dev/tty.usbmodem14203')
+home_location = getattr(config, 'HOME_LOCATION', {'name': 'Drone Home', 'latitude': 40.7128, 'longitude': -74.0060})
+no_fly_zones_path = getattr(config, 'NO_FLY_ZONES_PATH', 'instance/no_fly_zones.json')
 
-print("Flask app and SocketIO initialized...")
+drone = DroneController(connection_string=connection_string)
 
-# Database Models
+# Initialize safety monitor
+safety_monitor = SafetyMonitor()
+if os.path.exists(no_fly_zones_path):
+    safety_monitor.load_no_fly_zones(no_fly_zones_path)
+
+# Database Models (must be defined before any routes/functions that use them)
 class Hospital(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -264,20 +275,19 @@ def index():
 
 @app.route('/request-blood', methods=['GET', 'POST'])
 def request_blood():
+    hospitals = Hospital.query.all()
     if request.method == 'POST':
+        hospital_id = request.form.get('hospital_id')
         blood_type = request.form.get('blood_type')
         units = int(request.form.get('units'))
         urgency = request.form.get('urgency')
 
-        # Automatically assign to the first available hospital
-        # In a real implementation, this would be based on user authentication or location
-        default_hospital = Hospital.query.first()
-        if not default_hospital:
-            flash('No hospitals available in the system', 'error')
+        if not hospital_id:
+            flash('Please select a hospital.', 'error')
             return redirect(url_for('request_blood'))
 
         request_obj = BloodRequest(
-            hospital_id=default_hospital.id,
+            hospital_id=hospital_id,
             blood_type=blood_type,
             units=units,
             urgency=urgency
@@ -286,15 +296,12 @@ def request_blood():
         db.session.commit()
 
         # Log the request
-        logging.info(f"New blood request: Hospital {default_hospital.name}, Blood Type {blood_type}, Units {units}, Urgency {urgency}")
-        
-        # Find nearest hospital with required blood
+        logging.info(f"New blood request: Hospital ID {hospital_id}, Blood Type {blood_type}, Units {units}, Urgency {urgency}")
         process_blood_request(request_obj)
-        
+        auto_start_mission()  # Automatically start mission if possible
         flash('Blood request submitted successfully!', 'success')
-        return redirect(url_for('index'))
-    
-    return render_template('request_blood.html')
+        return redirect(url_for('drone_status'))  # Redirect to status page after order
+    return render_template('request_blood.html', hospitals=hospitals)
 
 @app.route('/update-inventory', methods=['GET', 'POST'])
 def update_inventory():
@@ -321,6 +328,8 @@ def update_inventory():
 
         db.session.commit()
         logging.info(f"Inventory updated: Hospital ID {hospital_id}, Blood Type {blood_type}, Units {units}")
+        emit_mission_queue_update()  # Update queue for all clients
+        auto_start_mission()  # Automatically start mission if possible
         flash('Inventory updated successfully!', 'success')
         return redirect(url_for('update_inventory'))
 
@@ -338,7 +347,7 @@ def view_database():
                          requests=requests)
 
 @app.route('/drone-status')
-def drone_status():
+def drone_status_page():
     return render_template('drone_status.html')
 
 @app.route('/debug-gps')
@@ -587,6 +596,43 @@ def delete_hospital(hospital_id):
     flash('Hospital deleted successfully!', 'success')
     return redirect(url_for('manage_hospitals'))
 
+def emit_mission_queue_update():
+    """Emit the latest mission queue to all connected clients"""
+    pending_requests = BloodRequest.query.filter_by(status='pending').all()
+    missions = []
+    for req in pending_requests:
+        from_hospital = Hospital.query.get(req.hospital_id)
+        available_hospitals = Hospital.query.join(BloodInventory).filter(
+            BloodInventory.blood_type == req.blood_type,
+            BloodInventory.units >= req.units
+        ).all()
+        if available_hospitals:
+            source_hospital = min(
+                available_hospitals,
+                key=lambda h: abs(h.latitude - from_hospital.latitude) + abs(h.longitude - from_hospital.longitude)
+            )
+        else:
+            source_hospital = None
+        urgency_map = {'critical': 0, 'urgent': 10, 'normal': 20}
+        urgency_score = urgency_map.get(req.urgency, 30)
+        time_waiting = (datetime.utcnow() - req.created_at).total_seconds() / 3600
+        time_score = time_waiting * 5
+        distance_score = 0
+        if source_hospital:
+            distance_score = geodesic((source_hospital.latitude, source_hospital.longitude), (from_hospital.latitude, from_hospital.longitude)).km * 2
+        total_score = urgency_score + time_score + distance_score
+        missions.append({
+            'blood_type': req.blood_type,
+            'units': req.units,
+            'urgency': req.urgency,
+            'from_hospital': {'name': source_hospital.name} if source_hospital else {'name': 'N/A'},
+            'to_hospital': {'name': from_hospital.name} if from_hospital else {'name': 'N/A'},
+            'status': req.status.capitalize(),
+            'priority_score': round(total_score, 1)
+        })
+    missions.sort(key=lambda m: m['priority_score'])
+    socketio.emit('mission_queue_update', {'missions': missions})
+
 def process_blood_request(request_obj):
     requesting_hospital = Hospital.query.get(request_obj.hospital_id)
     available_hospitals = Hospital.query.join(BloodInventory).filter(
@@ -596,9 +642,9 @@ def process_blood_request(request_obj):
 
     if not available_hospitals:
         logging.warning(f"No hospitals found with required blood type {request_obj.blood_type}")
+        emit_mission_queue_update()  # Update queue for all clients
         return
 
-    # Find nearest hospital with required blood
     nearest_hospital = min(
         available_hospitals,
         key=lambda h: geodesic(
@@ -610,9 +656,21 @@ def process_blood_request(request_obj):
     logging.info(f"Route planned: From {nearest_hospital.name} to {requesting_hospital.name}")
     logging.info(f"Blood type: {request_obj.blood_type}, Units: {request_obj.units}")
 
-    # Update request status
-    request_obj.status = 'scheduled'
+    # Do NOT set status to 'scheduled' here; leave as 'pending' so it appears in the mission queue
     db.session.commit()
+    emit_mission_queue_update()  # Update queue for all clients
+
+def auto_start_mission():
+    """Automatically start the highest priority pending mission if drone is available"""
+    mission = select_best_mission()
+    if mission:
+        req = BloodRequest.query.get(mission['id'])
+        if req.status == 'pending':
+            req.status = 'scheduled'  # Mark as started
+            db.session.commit()
+            emit_mission_queue_update()
+            logging.info(f"Mission auto-started: Request ID {req.id}, Status set to scheduled.")
+            # Here you could trigger drone delivery logic if needed
 
 # WebSocket events
 @socketio.on('connect')
@@ -737,6 +795,73 @@ def handle_drone_status_request():
             'message': f'Status error: {str(e)}'
         })
 
+LOG_PATH = 'drone_operations.log'
+
+@app.route('/drone_log')
+def drone_log():
+    """Return recent user-friendly drone log entries as JSON"""
+    try:
+        if not os.path.exists(LOG_PATH):
+            return jsonify({'logs': []})
+        with open(LOG_PATH, 'r') as f:
+            lines = f.readlines()[-300:]  # last 300 lines for more context
+        # Only keep lines with a date and a clear English message, skip HTTP and technical lines
+        user_logs = []
+        for line in reversed(lines):
+            # Skip HTTP request logs and technical errors
+            if re.search(r'"GET|POST|socket.io|HTTP/1.1"', line):
+                continue
+            if re.search(r'(ERROR|WARNING|Exception|Traceback)', line):
+                continue
+            # Only keep lines with a date and a readable message
+            if re.search(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', line) and re.search(r'(Mission|Delivered|Takeoff|Connected|Disconnected|Battery|Arrived|Completed|Started|Returning|Armed|Ready|Blood request|Route planned|Units|Drone|No-fly zone)', line, re.IGNORECASE):
+                # Remove log level and IP if present
+                clean = re.sub(r' - (INFO|DEBUG|WARNING|ERROR) - .*? - ', ' - ', line)
+                user_logs.append(clean.strip())
+            if len(user_logs) >= 20:
+                break
+        return jsonify({'logs': list(reversed(user_logs))})
+    except Exception as e:
+        return jsonify({'logs': [f'Error reading log: {e}']})
+
+@app.route('/mission-queue')
+def mission_queue():
+    """Return all pending missions, ranked by priority and urgency"""
+    pending_requests = BloodRequest.query.filter_by(status='pending').all()
+    missions = []
+    for req in pending_requests:
+        from_hospital = Hospital.query.get(req.hospital_id)
+        available_hospitals = Hospital.query.join(BloodInventory).filter(
+            BloodInventory.blood_type == req.blood_type,
+            BloodInventory.units >= req.units
+        ).all()
+        if available_hospitals:
+            source_hospital = min(
+                available_hospitals,
+                key=lambda h: abs(h.latitude - from_hospital.latitude) + abs(h.longitude - from_hospital.longitude)
+            )
+        else:
+            source_hospital = None
+        urgency_map = {'critical': 0, 'urgent': 10, 'normal': 20}
+        urgency_score = urgency_map.get(req.urgency, 30)
+        time_waiting = (datetime.utcnow() - req.created_at).total_seconds() / 3600  # hours
+        time_score = time_waiting * 5
+        distance_score = 0
+        if source_hospital:
+            distance_score = geodesic((source_hospital.latitude, source_hospital.longitude), (from_hospital.latitude, from_hospital.longitude)).km * 2
+        total_score = urgency_score + time_score + distance_score
+        missions.append({
+            'blood_type': req.blood_type,
+            'units': req.units,
+            'urgency': req.urgency,
+            'from_hospital': {'name': source_hospital.name} if source_hospital else {'name': 'N/A'},
+            'to_hospital': {'name': from_hospital.name} if from_hospital else {'name': 'N/A'},
+            'status': req.status.capitalize(),
+            'priority_score': round(total_score, 1)
+        })
+    missions.sort(key=lambda m: m['priority_score'])
+    return jsonify({'missions': missions})
+
 if __name__ == '__main__':
     # Prevent double initialization
     import sys
@@ -752,4 +877,4 @@ if __name__ == '__main__':
     
     print("Starting Flask application...")
     print("The application will be available at http://localhost:5000")
-    socketio.run(app, debug=False, host='0.0.0.0', port=5000) 
+    socketio.run(app, debug=False, host='0.0.0.0', port=5000)
